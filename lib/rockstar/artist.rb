@@ -59,6 +59,7 @@
 module Rockstar
   class Artist < Base
     attr_accessor :name, :mbid, :playcount, :rank, :url, :thumbnail, :images, :count, :streamable
+    attr_accessor :image_large, :image_medium, :image_small, :summary, :content
     attr_accessor :chartposition
     
     # used for similar artists
@@ -93,9 +94,29 @@ module Rockstar
       end
     end
     
-    def initialize(name)
+    def initialize(name,  o={})
       raise ArgumentError, "Name is required" if name.blank?
       @name = name
+      options = {:include_info => false}.merge(o)
+      load_info() if options[:include_info]
+    end
+    
+    def load_info
+      doc           = self.class.fetch_and_parse("artist.getInfo", {:artist => @name})
+      @url          = Base.fix_url((doc).at(:url).inner_html)
+
+      @images = {}
+      (doc/'image').each {|image|
+        @images[image['size']] = image.inner_html
+      }
+
+      @image_large    = @images['large']
+      @image_medium   = @images['medium']
+      @image_small    = @images['small']
+
+      @mbid         = (doc).at(:mbid).inner_html
+      @summary      = (doc).at(:summary).inner_html if (doc).at(:summary)
+      @content      = (doc).at(:content).inner_html if (doc).at(:content)
     end
     
     def current_events(format=:ics)
