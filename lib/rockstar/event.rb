@@ -82,7 +82,7 @@ module Rockstar
         @title       = doc.search("/title").inner_html.strip
         @start_date  = Base.parse_time(doc.search("/startDate").inner_html.strip)
         @end_date    = Base.parse_time(doc.search("/endDate").inner_html.strip)
-        @description = doc.search("/description").inner_html.strip
+        @description = doc.search("/description").inner_text.strip
         @attendance  = doc.search("/attendance").inner_html.strip.to_i
         @reviews     = doc.search("/reviews").inner_html.strip.to_i
         @tag         = doc.search("/tag").inner_html.strip
