@@ -113,17 +113,15 @@ module Rockstar
       @url          = Base.fix_url((doc).at(:url).inner_html)
       
       web = Hpricot::XML(open(@url))
-      location = web.search("/html//p[@class='origin']/strong").inner_html
-      puts "--------------------"
-      puts location
-      if not location.blank?
-        location = location.split(", ")
+      location = web.search("/html//p[@class='origin']/strong")
+      if not location.search("//span[@class='locality']").blank?
+        @city = location.search("//span[@class='locality']").inner_html
+        @country = location.search("//span[@class='country-name']").inner_html
+      elsif not location.inner_html.blank? 
+        location = location.inner_html.split(", ") 
         @city = location.first.strip
         @country = location.last.split("(").first.strip
-        puts @city + "  " + @country
       end
-      puts "--------------------"        
-        
       
       @images = {}
       (doc/'image').each {|image|
