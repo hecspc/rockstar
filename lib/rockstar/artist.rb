@@ -59,7 +59,7 @@
 module Rockstar
   class Artist < Base
     attr_accessor :name, :mbid, :playcount, :rank, :url, :thumbnail, :images, :count, :streamable
-    attr_accessor :image_large, :image_medium, :image_small, :summary, :content, :error
+    attr_accessor :image_large, :image_medium, :image_small, :summary, :content, :error, :city, :country
     attr_accessor :chartposition
     
     # used for similar artists
@@ -111,7 +111,20 @@ module Rockstar
       end
       @error = false
       @url          = Base.fix_url((doc).at(:url).inner_html)
-
+      
+      web = Hpricot::XML(open(@url))
+      location = web.search("/html//p[@class='origin']/strong").inner_html
+      puts "--------------------"
+      puts location
+      if not location.blank?
+        location = location.split(", ")
+        @city = location.first.strip
+        @country = location.last.split("(").first.strip
+        puts @city + "  " + @country
+      end
+      puts "--------------------"        
+        
+      
       @images = {}
       (doc/'image').each {|image|
         @images[image['size']] = image.inner_html
