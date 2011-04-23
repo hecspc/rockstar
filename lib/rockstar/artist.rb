@@ -60,7 +60,7 @@ module Rockstar
   class Artist < Base
     attr_accessor :name, :mbid, :playcount, :rank, :url, :thumbnail, :images, :count, :streamable
     attr_accessor :image_large, :image_medium, :image_small, :summary, :content, :error, :city, :country
-    attr_accessor :chartposition
+    attr_accessor :chartposition, :image_mega, :image_extralarge
     
     # used for similar artists
     attr_accessor :match
@@ -122,15 +122,18 @@ module Rockstar
         @city = location.first.strip
         @country = location.last.split("(").first.strip
       end
-      
+      (doc/"similar").remove
       @images = {}
       (doc/'image').each {|image|
         @images[image['size']] = image.inner_html
       }
+
       @name           = (doc).at(:name).inner_html
-      @image_large    = @images['large']
-      @image_medium   = @images['medium']
-      @image_small    = @images['small']
+      @image_large    = @images["large"]
+      @image_medium   = @images["medium"]
+      @image_small    = @images["small"]
+      @image_extralarge    = @images["extralarge"]
+      @image_mega    = @images["mega"]
 
       @mbid         = (doc).at(:mbid).inner_html
       @summary      = (doc).at(:summary).inner_text if (doc).at(:summary)
